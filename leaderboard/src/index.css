@@ -1,0 +1,9 @@
+/* Default Vite reset – SAFE */
+:root {
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+}
