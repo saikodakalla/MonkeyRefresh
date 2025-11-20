@@ -1,18 +1,26 @@
 {
   "manifest_version": 3,
-  "name": "Monkeytype Auto-Refresh + Leaderboard",
-  "version": "2.0",
-  "permissions": ["storage", "activeTab", "scripting"],
-  "host_permissions": ["https://monkeytype.com/*", "http://localhost:5050/*"],
+  "name": "Typing Auto-Refresh",
+  "version": "3.0",
+  "description": "Auto-refresh Monkeytype tests and show live accuracy overlay.",
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab",
+    "tabs",
+    "http://localhost:5050/*"
+  ],
+  "host_permissions": ["http://localhost:5050/*", "*://monkeytype.com/*"],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
   },
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://monkeytype.com/*"],
+      "matches": ["*://monkeytype.com/*"],
       "js": ["content.js"]
     }
   ]

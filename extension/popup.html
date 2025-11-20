@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <h1>Typing Auto-Refresh</h1>
+
+    <!-- Auto Refresh Toggle -->
+    <div class="card">
+      <label class="header-row">
+        <span>Auto-Refresh</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle" />
+          <span class="slider"></span>
+        </label>
+      </label>
+      <p class="subtext">Turns the entire extension on or off.</p>
+    </div>
+
+    <!-- Accuracy Threshold -->
+    <div class="card">
+      <label class="header-row">
+        <span>Accuracy Threshold: <span id="thresholdValue">100%</span></span>
+      </label>
+      <input type="range" id="threshold" min="0" max="100" value="100" />
+      <p class="subtext">
+        If your accuracy drops below this, the test restarts.
+      </p>
+    </div>
+
+    <!-- Live Accuracy Overlay -->
+    <div class="card">
+      <label class="header-row">
+        <span>Live Accuracy Overlay</span>
+        <label class="switch">
+          <input type="checkbox" id="overlayToggle" />
+          <span class="slider"></span>
+        </label>
+      </label>
+      <p class="subtext">Shows real-time accuracy on screen while typing.</p>
+    </div>
+
+    <!-- Save Button -->
+    <button id="saveBtn">Save Settings</button>
+    <div id="status"></div>
+
+    <!-- Analytics Button -->
+    <button id="analyticsBtn" class="secondary">View Global Leaderboard</button>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

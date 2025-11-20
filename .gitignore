@@ -1,13 +1,46 @@
-# Ignore environment variables
+# ===========================
+# Environment Variables
+# ===========================
 *.env
+*/**/.env
 
-# Node
+# ===========================
+# Node Modules
+# ===========================
 node_modules/
+*/node_modules/
+**/node_modules/
 
+# ===========================
+# Build Output
+# ===========================
+dist/
+build/
+out/
+.cache/
+coverage/
+
+# ===========================
 # Logs
+# ===========================
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# OS files
+# ===========================
+# OS Files (Mac)
+# ===========================
 .DS_Store
+
+# ===========================
+# Chrome Extension
+# ===========================
+Extension.zip
+*.crx
+
+# ===========================
+# Misc
+# ===========================
+*.log
+Thumbs.db

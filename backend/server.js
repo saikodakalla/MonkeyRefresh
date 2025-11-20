@@ -2,6 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import "dotenv/config";
+import moment from "moment-timezone";
+console.log(">>> USING SERVER FILE:", import.meta.url);
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -9,7 +11,7 @@ const PORT = process.env.PORT || 5050;
 // ---------- MIDDLEWARE ----------
 app.use(
   cors({
-    origin: true, // allow localhost:5173 and the extension
+    origin: true, // allow extension + local / deployed frontends
   })
 );
 app.use(express.json());
@@ -24,21 +26,29 @@ mongoose
 const StatsSchema = new mongoose.Schema(
   {
     userId: { type: String, unique: true, index: true },
-    username: { type: String, unique: true },
-    refreshCount: { type: Number, default: 0 },
-    logs: { type: [Date], default: [] },
+    username: { type: String },
+    refreshCount: { type: Number, default: 0 }, // total all-time
+    logs: { type: [Date], default: [] }, // every refresh timestamp
   },
   { timestamps: true }
 );
 
 const Stats = mongoose.model("Stats", StatsSchema);
 
+// Utility: generate a readable username from userId
 function generateUsername(userId) {
   const suffix = (userId || "")
     .replace(/[^a-zA-Z0-9]/g, "")
     .slice(-6)
     .toUpperCase();
   return `Player-${suffix || Math.random().toString(36).slice(2, 8)}`;
+}
+
+// Utility: returns "MM/DD/YYYY" string for a given timestamp in EST
+function estDateString(dateLike) {
+  return new Date(dateLike).toLocaleDateString("en-US", {
+    timeZone: "America/Toronto", // EST/EDT
+  });
 }
 
 // ---------- ROUTES ----------
@@ -108,7 +118,7 @@ app.post("/log-refresh", async (req, res) => {
   }
 });
 
-// Per-user stats for dashboard
+// Per-user stats (if you still need it)
 app.get("/stats/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -135,7 +145,7 @@ app.get("/stats/:userId", async (req, res) => {
   }
 });
 
-// Leaderboard
+// Leaderboard (if you still want it anywhere)
 app.get("/leaderboard", async (_req, res) => {
   try {
     const docs = await Stats.find({})
@@ -154,7 +164,72 @@ app.get("/leaderboard", async (_req, res) => {
   }
 });
 
+// ⭐ Global refresh total for today (EST) using refreshCount
+app.get("/global-refresh-total", async (_req, res) => {
+  try {
+    console.log("🔥 /global-refresh-total HIT");
+
+    const tz = "America/Toronto";
+
+    // Define today in EST
+    const todayStartEST = moment().tz(tz).startOf("day");
+    const todayEndEST = moment().tz(tz).endOf("day");
+
+    console.log(
+      "📅 Today EST:",
+      todayStartEST.format(),
+      "→",
+      todayEndEST.format()
+    );
+
+    // Convert to UTC for Mongo query
+    const startUTC = todayStartEST.clone().utc().toDate();
+    const endUTC = todayEndEST.clone().utc().toDate();
+
+    // Get ONLY logs from today using $filter + aggregation
+    const result = await Stats.aggregate([
+      {
+        $project: {
+          logs: {
+            $filter: {
+              input: "$logs",
+              as: "log",
+              cond: {
+                $and: [
+                  { $gte: ["$$log", startUTC] },
+                  { $lte: ["$$log", endUTC] },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalLogsToday: { $sum: { $size: "$logs" } },
+        },
+      },
+    ]);
+
+    const total = result[0]?.totalLogsToday || 0;
+
+    console.log("🔥 TOTAL refreshes today:", total);
+    res.json({ total });
+  } catch (err) {
+    console.error("❌ Error in /global-refresh-total:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // ---------- START ----------
 app.listen(PORT, () => {
   console.log(`🚀 Backend running on http://localhost:${PORT}`);
 });
+
+console.log("🔥 ROUTES LOADED:");
+console.log(" - POST /ensure-user");
+console.log(" - POST /log-refresh");
+console.log(" - GET  /stats/:userId");
+console.log(" - GET  /leaderboard");
+console.log(" - GET  /global-refresh-total");
