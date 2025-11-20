@@ -1,6 +1,7 @@
 // ===============================
 // Typing Auto-Refresh + Overlay
 // ===============================
+const API_URL = "https://monkeyrefresh.onrender.com";
 
 // SETTINGS
 let settings = {
@@ -33,7 +34,7 @@ chrome.storage.local.get(["username"], (data) => {
 function registerUserWithBackend() {
   if (!userId) return;
 
-  fetch("http://localhost:5050/ensure-user", {
+  fetch(`${API_URL}/ensure-user`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId }),
@@ -126,7 +127,7 @@ function removeOverlay() {
 function sendRefreshLog() {
   if (!userId) return Promise.resolve(); // makes it awaitable even if no user
 
-  return fetch("http://localhost:5050/log-refresh", {
+  return fetch(`${API_URL}/log-refresh`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ userId, username }),

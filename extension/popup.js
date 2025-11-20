@@ -37,6 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   analyticsBtn.addEventListener("click", () => {
-    chrome.tabs.create({ url: "http://localhost:5173" });
+    chrome.tabs.create({ url: "https://monkey-refresh.vercel.app" });
   });
 });

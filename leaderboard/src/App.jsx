@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function App() {
   const [count, setCount] = useState(0);
@@ -9,10 +10,7 @@ export default function App() {
   useEffect(() => {
     async function loadCount() {
       try {
-        const res = await axios.get(
-          "http://localhost:5050/global-refresh-total"
-        );
-        // ✅ backend returns { total: number }
+        const res = await axios.get(`${API_URL}/global-refresh-total`);
         setCount(res.data.total ?? 0);
       } catch (err) {
         console.error("Failed to load global count:", err);
